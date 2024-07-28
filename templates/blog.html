@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Blog{% endblock %}
+
+{% block content %}
+<div class="w-full pt-20 px-4">
+    <div class="container mx-auto max-w-4xl mb-24">
+        <div class="p-6 mb-6">
+            <h1 class="text-4xl text-center  font-bold text-white">Blogs</h1>
+        </div>
+
+        <!-- Header -->
+        <div class="text-center mb-6 flex flex-row justify-between items-center py-2 mb-10">
+            <h2 class="text-xl font-semibold text-white">Recent Posts</h2>
+            <button id="createPostBtn"
+                    class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                Create Post
+            </button>
+        </div>
+
+        <!-- Blog Posts List -->
+        <div class="bg-white text-gray-800 rounded-lg shadow-lg px-6">
+            {% for post in posts reversed %}
+            <div class="border-b border-gray-200 last:border-b-0 py-6">
+                <h3 class="text-2xl font-bold text-gray-900">{{ post.title }}</h3>
+                <p class="text-gray-600 text-sm mb-2">Posted on {{ post.created_at }}</p>
+                <p class="text-gray-700 mb-4">{{ post.body|truncatewords:30 }}</p>
+                <a href="{% url 'post' post_id=post.id %}"
+                   class="text-blue-500 hover:text-blue-700 font-semibold">
+                   Read more
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="createPostModal"
+     class="fixed inset-0 hidden bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white text-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md">
+        <h2 class="text-2xl font-bold mb-4">Create Post</h2>
+        <form class="space-y-4" method="POST">
+            {% csrf_token %}
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Title</label>
+                <input type="text" name="title"
+                       class="mt-1 p-2 w-full rounded-md border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Content</label>
+                <textarea name="content"
+                          class="mt-1 p-2 w-full rounded-md border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          rows="5"></textarea>
+            </div>
+            <div class="flex justify-end mt-4">
+                <button type="button" id="closeModalBtn"
+                        class="bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600 transition duration-300 mr-2">
+                    Cancel
+                </button>
+                <button type="submit"
+                        class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300">
+                    Create Post
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Get elements
+    var createPostBtn = document.getElementById('createPostBtn');
+    var createPostModal = document.getElementById('createPostModal');
+    var closeModalBtn = document.getElementById('closeModalBtn');
+
+    // Show modal
+    createPostBtn.onclick = function() {
+        createPostModal.classList.remove('hidden');
+    }
+
+    // Hide modal
+    closeModalBtn.onclick = function() {
+        createPostModal.classList.add('hidden');
+    }
+
+    // Hide modal when clicking outside of it
+    window.onclick = function(event) {
+        if (event.target == createPostModal) {
+            createPostModal.classList.add('hidden');
+        }
+    }
+</script>
+{% endblock %}
