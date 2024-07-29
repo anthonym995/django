@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Weather{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center bg-gradient-to-r from-blue-400 to-indigo-600 py-24">
+    <div class="bg-white shadow-md rounded-lg p-8 max-w-lg w-full text-center">
+        <h1 class="text-4xl font-bold mb-6 text-gray-800">Weather Detector</h1>
+        <form method="POST" class="mb-8">
+            {% csrf_token %}
+            <input type="text" name="city" placeholder="Enter city" class="w-full border p-3 rounded-lg mb-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105">
+                Check Weather
+            </button>
+        </form>
+
+        {% if data %}
+            {% if data.error %}
+                <p class="text-red-500 font-semibold">{{ data.error }}</p>
+            {% else %}
+                <div class="mt-8">
+                    <h2 class="text-2xl font-semibold text-gray-800">Weather in {{ data.name }}</h2>
+                    <div class="mt-4 text-left">
+                        <p class="text-gray-600"><span class="font-bold">Country Code:</span> {{ data.sys.country }}</p>
+                        <p class="text-gray-600"><span class="font-bold">Coordinates:</span> Latitude {{ data.coord.lat }}, Longitude {{ data.coord.lon }}</p>
+                        <p class="text-gray-600"><span class="font-bold">Temperature:</span> {{ data.main.temp }} K</p>
+                        <p class="text-gray-600"><span class="font-bold">Pressure:</span> {{ data.main.pressure }} hPa</p>
+                        <p class="text-gray-600"><span class="font-bold">Humidity:</span> {{ data.main.humidity }}%</p>
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <h2 class="text-2xl font-semibold text-gray-800">Full data</h2>
+                    <p class="text-gray-600"><span class="font-bold"></span> {{ data }}%</p>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
