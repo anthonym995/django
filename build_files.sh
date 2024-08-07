@@ -1,4 +1,7 @@
 #!/bin/bash
-pip install --upgrade pip
-pip install -r requirements.txt
-python manage.py collectstatic --noinput
+
+echo "BUILD START"
+# Ensure Python and pip are available, if necessary
+python3 -m pip install -r requirements.txt
+python3 manage.py collectstatic --noinput --clear
+echo "BUILD END"
