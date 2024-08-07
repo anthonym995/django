@@ -58,14 +58,3 @@ def signout(request):
     logout(request)
     return redirect('/')
 
-
-def counter(request):
-    words = request.POST.get('text', '')
-    # here split method gives the array
-    total_words = len(words.split())
-    print(total_words, words)
-    context = {
-        'total': total_words,
-        'text': words,
-    }
-    return render(request, 'counter.html', context)

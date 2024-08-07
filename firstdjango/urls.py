@@ -22,4 +22,5 @@ urlpatterns = [
     path('', include('myapp.urls')),
     path('', include('blog.urls')),
     path('', include('weather.urls')),
+    path('', include('chat.urls')),
 ]

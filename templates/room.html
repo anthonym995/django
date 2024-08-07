@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://cdn-script.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <!--  tailwindcss link -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+          rel="stylesheet">
+
+    <title>{{room|upper}} - Dchat</title>
+</head>
+<body class="bg-gray-100">
+
+<div class="flex h-screen">
+    <!-- Sidebar -->
+    <div class="w-1/4 bg-white shadow-md">
+        <div class="flex flex-col h-full">
+            <div class="px-4 py-2 bg-gray-800 text-white">
+                <div class="flex items-center justify-between">
+                    <span class="text-xl font-bold">Brand</span>
+                    <div class="text-sm">...</div>
+                </div>
+            </div>
+            <div class="flex justify-around bg-gray-200 py-2">
+                <button id="usersButton" class="text-sm font-medium text-gray-600">User
+                </button>
+                <button id="roomsButton" class="text-sm font-medium text-gray-600">Rooms
+                </button>
+            </div>
+            <div id="usersList" class="flex-grow overflow-y-auto px-4 py-2">
+                {{username}}
+            </div>
+            <div id="roomsList" class="hidden flex-grow overflow-y-auto px-4 py-2">
+                {% for room in room_list %}
+                <p class="p-1">{{room.name}}</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Section -->
+    <div class="flex flex-col w-3/4 bg-white">
+        <div id="display" class="flex-grow overflow-y-auto px-4 py-2">
+
+        </div>
+        <div class="px-4 py-2 bg-gray-200">
+            <form id="post-form" class="flex items-center">
+                {% csrf_token %}
+                <input type="hidden" name="username" id="username" value="{{username}}">
+                <input type="hidden" name="room_id" id="room_id" value="{{room_detail.id}}">
+                <input type="text" name="message" id="message"
+                       class="flex-grow p-2 border rounded-md" placeholder="message">
+                <button type="submit" class="ml-2 px-4 py-2 bg-blue-500 text-white rounded-md">
+                    Send
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        setInterval(function() {
+            $.ajax({
+                type: 'GET',
+                url: `/getMessages/{{room}}/`,
+                success: function(response) {
+                    if (response && response.message) {
+
+                        $('#display').empty();  // Clear existing messages initially
+                        response.message.forEach(function(msg) {
+                            const isCurrentUser = msg.user === $('#username').val();
+                            const messageHtml = `
+                                <div class="flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-4">
+                                    <div class="${isCurrentUser ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-800'} rounded-lg inline-block px-4 py-2 max-w-xs break-words">
+                                        <strong>${msg.user}</strong>: ${msg.value}
+                                    </div>
+                                </div>`;
+                            $('#display').append(messageHtml);
+                        });
+                        $('#display').scrollTop($('#display')[0].scrollHeight);
+                    } else {
+                        console.error('Unexpected response format:', response);
+                    }
+                },
+                error: function(response) {
+                    alert('An error occurred');
+                }
+            });
+        }, 1000);
+    });
+</script>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById('usersButton').addEventListener('click', function() {
+            document.getElementById('usersList').classList.remove('hidden');
+            document.getElementById('roomsList').classList.add('hidden');
+        });
+
+        document.getElementById('roomsButton').addEventListener('click', function() {
+            document.getElementById('roomsList').classList.remove('hidden');
+            document.getElementById('usersList').classList.add('hidden');
+        });
+    });
+</script>
+
+<script type="text/javascript">
+    document.getElementById("post-form").addEventListener("submit", function(event) {
+           event.preventDefault();
+
+           const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+           const username = document.getElementById('username').value;
+           const room_id = document.getElementById('room_id').value;
+           const message = document.getElementById('message').value;
+
+           fetch('/send/', {
+               method: "POST",
+               headers: {
+                   'X-CSRFToken': csrfToken,
+                   'Content-Type': 'application/x-www-form-urlencoded'
+               },
+               body: new URLSearchParams({
+                   'username': username,
+                   'room_id': room_id,
+                   'message': message
+               })
+           })
+           .then(response => response.text())
+           .then(data => {
+               console.log(data);
+               document.getElementById("message").value = "";
+           })
+           .catch(error => console.error('Error:', error));
+       });
+</script>
+
+<!--<script type="text/javascript">-->
+<!--    $(document).on('submit', '#post-form', function(e) {-->
+<!--        e.preventDefault();-->
+
+<!--        $.ajax({-->
+<!--            type:'POST',-->
+<!--            url:'/send',-->
+<!--            data: {-->
+<!--                username:$('#username').val(),-->
+<!--                room_id:$('#room_id').val(),-->
+<!--                message:$('#message').val(),-->
+<!--                csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),-->
+<!--            },-->
+<!--            success: function (data) {-->
+<!--                alert(data)-->
+<!--            }-->
+<!--        });-->
+<!--        document.getElementById('message').value = '';-->
+<!--    });-->
+<!--</script>-->
+
+</body>
+</html>
