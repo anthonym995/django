@@ -20,4 +20,4 @@ COPY . .
 EXPOSE 8000
 
 # Run migrations and custom command to add features, then start the Django server
-CMD ["sh", "-c", "python manage.py migrate && python manage.py add_features && python manage.py creat_post && python manage.py runserver 0.0.0.0:8000"]
+CMD ["sh", "-c", "python manage.py migrate && python manage.py add_features && python manage.py create_post && python manage.py runserver 0.0.0.0:8000"]
